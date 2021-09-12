@@ -1,6 +1,5 @@
 <template>
   <!-- Section Hero -->
-   <div v-for="(item,index) in testData2" :key="index"> {{ item }} </div>
 
   <div class="bg-green-100 py-14">
     <h3 class="text-2xl tracking-widest text-center text-green-600">DỊCH VỤ</h3>
@@ -31,7 +30,7 @@ import { ref, child, get, onChildAdded } from "firebase/database";
 const boxStyle = "md:flex md:justify-center md:space-x-8 md:px-14"
 const cardStyle = "px-4 py-4 mx-auto mt-16 transition duration-500 transform bg-white shadow-lg bg-whit w-72 rounded-xl hover:shadow-xl hover:scale-110 md:mx-0"
 const buttonStyle = "py-2 mt-8 mb-4 tracking-widest text-white transition duration-200 bg-green-600 rounded-full px-14 hover:bg-green-500"
-</script>
+           </script>
 
 <script>
 export default {
@@ -59,7 +58,7 @@ export default {
   }, mounted() {
 
     this.testFetchDb(),
-    this.testListenDb()
+      this.testListenDb()
 
   }, methods: {
     testFetchDb() {
@@ -74,8 +73,8 @@ export default {
       });
     },
     testListenDb() {
-      onChildAdded(child(ref(firebaseDb), `data`),(data) => {
-        this.testData2.push({a:data.key,b: data.val()});
+      onChildAdded(child(ref(firebaseDb), `data`), (data) => {
+        this.testData2.push({ a: data.key, b: data.val() });
       });
     }
   }
