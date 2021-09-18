@@ -27,54 +27,51 @@
 </template>
 
 <script setup>
+import { ref, reactive, onMounted, onUpdated, computed } from "vue";
+import { useRouter } from "vue-router";
+
 const button_css =
   "block px-6 py-4 text-gray-600 hover:text-green-500 focus:outline-none";
 const button_selected =
   "block px-6 py-4 font-medium text-gray-600 text-blue-500 border-b-2 border-blue-500 hover:text-green-500 focus:outline-none";
-</script>
+const router = useRouter();
 
-<script>
-export default {
-  data() {
-    return {
-      nav_bar_content: [
-        {
-          name: "Sale page",
-          link: "/sale",
-          isActive: true,
-        },
-        {
-          name: "Login",
-          link: "/login",
-          isActive: false,
-        },
-        {
-          name: "Chat",
-          link: "/chat",
-          isActive: false,
-        }
-      ],
-    };
+const nav_bar_content = reactive([
+  {
+    name: "Sale page",
+    link: "/sale",
+    isActive: true,
   },
-  methods: {
-    resetTabState() {
-      for (var item of this.nav_bar_content) {
-        item.isActive = false;
-      }
-    },
-    tabClicked(index) {
-      this.resetTabState();
-      this.nav_bar_content[index].isActive = true;
-    },
-    tabChosen(input_link) {
-      if (input_link === "/chat") {
-        // const random_chatid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-        const random_chatid = "room_2000";
-        this.$router.push(input_link + `/${random_chatid}`);
-      } else {
-        this.$router.push(input_link);
-      }
-    },
+  {
+    name: "Login",
+    link: "/login",
+    isActive: false,
   },
+  {
+    name: "Chat",
+    link: "/chat",
+    isActive: false,
+  },
+]);
+
+const resetTabState = () => {
+  for (var item of nav_bar_content) {
+    item.isActive = false;
+  }
+};
+
+const tabClicked = (index) => {
+  resetTabState();
+  nav_bar_content[index].isActive = true;
+};
+
+const tabChosen = (input_link) => {
+  if (input_link === "/chat") {
+    // const random_chatid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    const random_chatid = "room_2000";
+    router.push(input_link + `/${random_chatid}`);
+  } else {
+    router.push(input_link);
+  }
 };
 </script>
