@@ -52,13 +52,7 @@ export default {
           name: "Chat",
           link: "/chat",
           isActive: false,
-        },
-        {
-          name: "thunghiem",
-          link: "/thunghiem",
-          isActive: false,
-        },
-        { name: "testComposition", link: "/testComposition", isActive: false },
+        }
       ],
     };
   },

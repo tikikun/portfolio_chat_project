@@ -23,7 +23,7 @@
         </div>
         <!-- Input nickanme -->
         <textarea
-          v-model="username"
+          v-model="chatPayLoad.username"
           style="outline: none"
           class="px-4 m-2 mr-1 bg-gray-200 border border-gray-300 rounded-full resize-none "
           placeholder="Input nickname here"
@@ -44,7 +44,10 @@
       <!-- fetch chat -->
       <div class="mt-20 mb-20">
         <div v-for="(message, index) in messages" :key="index" class="clearfix">
-          <div v-if="message.username != username" :class="friendBubble">
+          <div
+            v-if="message.username != chatPayLoad.username"
+            :class="friendBubble"
+          >
             {{ message.message }}
           </div>
           <div v-else :class="myBubble">{{ message.message }}</div>
@@ -57,12 +60,12 @@
       style="bottom: 0px"
     >
       <textarea
-        @keyup.enter="sendMessage"
+        @keyup.enter="sendMessage(room_id)"
         class="flex-grow px-4 py-2 m-2 mr-1 bg-gray-200 border border-gray-300 rounded-full resize-none "
         rows="1"
         placeholder="Message..."
         style="outline: none"
-        v-model="typedMessage"
+        v-model="chatPayLoad.typedMessage"
       ></textarea>
       <button @click="sendMessage" class="m-2" style="outline: none">
         <svg
@@ -82,74 +85,89 @@
   </body>
 </template>
 
-<script>
+<script setup>
 import { firebaseDb } from "../firebase/firebase.js";
-import { ref, child, onChildAdded, push } from "firebase/database";
+import {
+  ref as fire_db_ref,
+  child,
+  onChildAdded,
+  push,
+} from "firebase/database";
+import { ref, reactive, onMounted, onUpdated, computed } from "vue";
+import { useRoute } from "vue-router";
 
-export default {
-  data() {
-    return {
-      friendBubble:
-        "clear-both w-3/4 p-2 mx-4 my-2 bg-gray-300 rounded-lg mb-1",
-      myBubble:
-        "clear-both float-right w-3/4 p-2 mx-4 my-2 bg-green-300 rounded-lg mb-3",
-      SVG_info:
-        "M476 3.2L12.5 270.6c-18.1 10.4-15.8 35.6 2.2 43.2L121 358.4l287.3-253.2c5.5-4.9 13.3 2.6 8.6 8.3L176 407v80.5c0 23.6 28.5 32.9 42.5 15.8L282 426l124.6 52.2c14.2 6 30.4-2.9 33-18.2l72-432C515 7.8 493.3-6.8 476 3.2z",
+// get the router
+const route = useRoute();
 
-      username: "alan",
-      typedMessage: "",
-      messages: [
-        {
-          timestamp: 1,
-          message: "Hello i'm alan",
-          username: "peter",
-          isSender: false,
-        },
-      ],
-    };
-  },
-  beforeMount() {
-    this.listenForMessages();
-  },
-  mounted() {},
-  updated() {
-    this.$nextTick(() => this.scrollToEnd());
-  },
-  methods: {
-    sendMessage() {
-      let sent_data = this.chatPayLoad;
-      let room_id = this.$route.params.chatid;
-      push(
-        child(ref(firebaseDb), `chatroom/${room_id}/messages`),
-        sent_data
-      ).catch((err) => console.log(err));
-      this.typedMessage = "";
-    },
+// styling sectio
+const friendBubble =
+  "clear-both w-3/4 p-2 mx-4 my-2 bg-gray-300 rounded-lg mb-1";
+const myBubble =
+  "clear-both float-right w-3/4 p-2 mx-4 my-2 bg-green-300 rounded-lg mb-3";
+const SVG_info =
+  "M476 3.2L12.5 270.6c-18.1 10.4-15.8 35.6 2.2 43.2L121 358.4l287.3-253.2c5.5-4.9 13.3 2.6 8.6 8.3L176 407v80.5c0 23.6 28.5 32.9 42.5 15.8L282 426l124.6 52.2c14.2 6 30.4-2.9 33-18.2l72-432C515 7.8 493.3-6.8 476 3.2z";
 
-    listenForMessages() {
-      const room_id = this.$route.params.chatid;
-      onChildAdded(
-        child(ref(firebaseDb), `chatroom/${room_id}/messages`),
-        (data) => {
-          //console.log(data.val());
-          this.messages.push(data.val());
-        }
-      );
-    },
-    scrollToEnd() {
-      // scroll to the start of the last message
-      window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
-      //this.$el.scrollTop = this.$el.lastElementChild.offsetTop;
-    },
+// messages to display
+const messages = reactive([
+  {
+    timestamp: 1,
+    message: "Hello i'm alan",
+    username: "peter",
+    isSender: false,
   },
-  computed: {
-    chatPayLoad() {
-      return {
-        timestamp: Date.now(),
-        message: this.typedMessage,
-        username: this.username,
-      };
-    },
-  },
+]);
+
+// chat state data
+const chatPayLoad = reactive({
+  timestamp: null,
+  typedMessage: "",
+  username: "alan",
+});
+
+// Specify room id
+const room_id = route.params.chatid ;
+
+// On mounted function
+onMounted(() => {
+  listenForMessages(room_id);
+  //console.log(room_id);
+});
+
+// On update ** scroll to the bottom
+onUpdated(() => {
+  scrollToEnd();
+});
+
+// Listen for update on database 
+const listenForMessages = (room_id) => {
+  onChildAdded(
+    child(fire_db_ref(firebaseDb), `chatroom/${room_id}/messages`),
+    (data) => {
+      messages.push(data.val());
+    }
+  );
+};
+
+// Scroll to end 
+const scrollToEnd = () => {
+  window.scrollTo(
+    0,
+    document.body.scrollHeight || document.documentElement.scrollHeight
+  );
+};
+
+// Send message
+const sendMessage = (room_id) => {
+  chatPayLoad.timestamp = Date.now();
+  let sent_data = {
+    timestamp: Date.now(),
+    message: chatPayLoad.typedMessage,
+    username: chatPayLoad.username,
+  };
+  push(
+    child(fire_db_ref(firebaseDb), `chatroom/${room_id}/messages`),
+    sent_data
+  ).catch((err) => console.log(err));
+  chatPayLoad.typedMessage = "";
 };
 </script>
