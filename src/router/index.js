@@ -5,6 +5,8 @@ import FooterComponent from "/src/components/FooterComponent.vue";
 import SalePage from "/src/components/SalePage.vue";
 import UserInfoPage from "/src/components/UserInfoPage.vue";
 import ChatComponent from "/src/components/ChatComponent.vue";
+import testComponent from "/src/components/testComponent.vue";
+import testComposition from "/src/components/testComposition.vue"
 
 const routes = [
   {
@@ -35,22 +37,35 @@ const routes = [
     },
   },
   {
-    path: "/user/:id",
+    path: "/user/:name",
     name: "User page",
     components: {
       default: UserInfoPage,
       header: NavBarComponent,
       footer: FooterComponent,
     },
-    
-  }, {
-    path: "/chat",
+  },
+  {
+    path: "/chat/:chatid",
     name: "Chat page",
     components: {
-      default: ChatComponent
+      default: ChatComponent,
     },
-    
-  }
+  },
+  {
+    path: "/thunghiem",
+    name: "thgunoasdjnf",
+    components: {
+      default: testComponent,
+    },
+  },
+  {
+    path: "/testComposition/:chatid",
+    name: "test composition",
+    components: {
+      default: testComposition,
+    },
+  },
 ];
 
 const router = createRouter({
