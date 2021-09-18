@@ -82,22 +82,20 @@
   </body>
 </template>
 
-<script setup>
+<script>
 import { firebaseDb } from "../firebase/firebase.js";
 import { ref, child, onChildAdded, push } from "firebase/database";
 
-const friendBubble =
-  "clear-both w-3/4 p-2 mx-4 my-2 bg-gray-300 rounded-lg mb-1";
-const myBubble =
-  "clear-both float-right w-3/4 p-2 mx-4 my-2 bg-green-300 rounded-lg mb-3";
-const SVG_info =
-  "M476 3.2L12.5 270.6c-18.1 10.4-15.8 35.6 2.2 43.2L121 358.4l287.3-253.2c5.5-4.9 13.3 2.6 8.6 8.3L176 407v80.5c0 23.6 28.5 32.9 42.5 15.8L282 426l124.6 52.2c14.2 6 30.4-2.9 33-18.2l72-432C515 7.8 493.3-6.8 476 3.2z";
-</script>
-
-<script>
 export default {
   data() {
     return {
+      friendBubble:
+        "clear-both w-3/4 p-2 mx-4 my-2 bg-gray-300 rounded-lg mb-1",
+      myBubble:
+        "clear-both float-right w-3/4 p-2 mx-4 my-2 bg-green-300 rounded-lg mb-3",
+      SVG_info:
+        "M476 3.2L12.5 270.6c-18.1 10.4-15.8 35.6 2.2 43.2L121 358.4l287.3-253.2c5.5-4.9 13.3 2.6 8.6 8.3L176 407v80.5c0 23.6 28.5 32.9 42.5 15.8L282 426l124.6 52.2c14.2 6 30.4-2.9 33-18.2l72-432C515 7.8 493.3-6.8 476 3.2z",
+
       username: "alan",
       typedMessage: "",
       messages: [
@@ -110,19 +108,24 @@ export default {
       ],
     };
   },
-  mounted() {
+  beforeMount() {
     this.listenForMessages();
   },
+  mounted() {},
+  updated() {
+    this.$nextTick(() => this.scrollToEnd());
+  },
   methods: {
-     sendMessage() {
-      let sent_data = this.chatPayLoad
+    sendMessage() {
+      let sent_data = this.chatPayLoad;
       let room_id = this.$route.params.chatid;
       push(
         child(ref(firebaseDb), `chatroom/${room_id}/messages`),
         sent_data
-      ).catch(err => console.log(err));
+      ).catch((err) => console.log(err));
       this.typedMessage = "";
     },
+
     listenForMessages() {
       const room_id = this.$route.params.chatid;
       onChildAdded(
@@ -132,6 +135,11 @@ export default {
           this.messages.push(data.val());
         }
       );
+    },
+    scrollToEnd() {
+      // scroll to the start of the last message
+      window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
+      //this.$el.scrollTop = this.$el.lastElementChild.offsetTop;
     },
   },
   computed: {
