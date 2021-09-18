@@ -7,12 +7,19 @@
             v-if="item.isActive"
             @click="tabClicked(index)"
             :class="button_selected"
-          >{{ item.name }}</button>
+          >
+            {{ item.name }}
+          </button>
           <button
             v-else
-            @click="tabClicked(index); testRouterPush(item.link)"
+            @click="
+              tabClicked(index);
+              tabChosen(item.link);
+            "
             :class="button_css"
-          >{{ item.name }}</button>
+          >
+            {{ item.name }}
+          </button>
         </li>
       </ul>
     </nav>
@@ -26,12 +33,10 @@ const button_selected =
   "block px-6 py-4 font-medium text-gray-600 text-blue-500 border-b-2 border-blue-500 hover:text-green-500 focus:outline-none";
 </script>
 
-<script>import router from "../router";
-
+<script>
 export default {
   data() {
     return {
-
       nav_bar_content: [
         {
           name: "Sale page",
@@ -43,11 +48,17 @@ export default {
           link: "/login",
           isActive: false,
         },
-                {
+        {
           name: "Chat",
           link: "/chat",
           isActive: false,
-        }
+        },
+        {
+          name: "thunghiem",
+          link: "/thunghiem",
+          isActive: false,
+        },
+        { name: "testComposition", link: "/testComposition", isActive: false },
       ],
     };
   },
@@ -61,10 +72,15 @@ export default {
       this.resetTabState();
       this.nav_bar_content[index].isActive = true;
     },
-    testRouterPush(input_link) {
-      router.push(input_link)
-    }
-
+    tabChosen(input_link) {
+      if (input_link === "/chat") {
+        // const random_chatid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+        const random_chatid = "room_2000";
+        this.$router.push(input_link + `/${random_chatid}`);
+      } else {
+        this.$router.push(input_link);
+      }
+    },
   },
 };
 </script>
