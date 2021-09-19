@@ -48,9 +48,11 @@
             v-if="message.username != chatPayLoad.username"
             :class="friendBubble"
           >
-            {{ message.message }}
+            {{ message.username }} : {{ message.message }}
           </div>
-          <div v-else :class="myBubble">{{ message.message }}</div>
+          <div v-else :class="myBubble">
+            {{ message.username }} : {{ message.message }}
+          </div>
         </div>
       </div>
     </div>
@@ -67,7 +69,7 @@
         style="outline: none"
         v-model="chatPayLoad.typedMessage"
       ></textarea>
-      <button @click="sendMessage" class="m-2" style="outline: none">
+      <button @click="sendMessage(room_id)" class="m-2" style="outline: none">
         <svg
           class="w-12 h-12 py-2 mr-2 text-green-400 svg-inline--fa fa-paper-plane fa-w-16"
           aria-hidden="true"
@@ -93,7 +95,7 @@ import {
   onChildAdded,
   push,
 } from "firebase/database";
-import { ref, reactive, onMounted, onUpdated, computed } from "vue";
+import { ref, reactive, onMounted, onUpdated, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 
 // get the router
@@ -109,12 +111,12 @@ const SVG_info =
 
 // messages to display
 const messages = reactive([
-  {
-    timestamp: 1,
-    message: "Hello i'm alan",
-    username: "peter",
-    isSender: false,
-  },
+  // {
+  //   timestamp: 1,
+  //   message: "Hello i'm alan",
+  //   username: "peter",
+  //   isSender: false,
+  // },
 ]);
 
 // chat state data
@@ -125,10 +127,10 @@ const chatPayLoad = reactive({
 });
 
 // Specify room id
-const room_id = route.params.chatid ;
+const room_id = route.params.chatid;
 
 // On mounted function
-onMounted(() => {
+onBeforeMount(() => {
   listenForMessages(room_id);
   //console.log(room_id);
 });
@@ -138,7 +140,7 @@ onUpdated(() => {
   scrollToEnd();
 });
 
-// Listen for update on database 
+// Listen for update on database
 const listenForMessages = (room_id) => {
   onChildAdded(
     child(fire_db_ref(firebaseDb), `chatroom/${room_id}/messages`),
@@ -148,7 +150,7 @@ const listenForMessages = (room_id) => {
   );
 };
 
-// Scroll to end 
+// Scroll to end
 const scrollToEnd = () => {
   window.scrollTo(
     0,
