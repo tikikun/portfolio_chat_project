@@ -1,8 +1,9 @@
 <template>
-  <body>
+<html>
+  <body v-if="loginState">
     <div style="overscroll-behavior: none">
       <div
-        class="fixed flex justify-between w-full h-16 pt-2 text-black bg-green-400 shadow-md "
+        class="fixed flex justify-between w-full h-16 pt-2 text-black bg-green-400 shadow-md"
         style="top: 0px; overscroll-behavior: none"
       >
         <!-- back button -->
@@ -18,14 +19,12 @@
             />
           </svg>
         </router-link>
-        <div class="my-3 text-lg font-bold tracking-wide text-green-100">
-          {{ $route.params.chatid }}
-        </div>
+        <div class="my-3 text-lg font-bold tracking-wide text-green-100">{{ $route.params.chatid }}</div>
         <!-- Input nickanme -->
         <textarea
           v-model="chatPayLoad.username"
           style="outline: none"
-          class="px-4 m-2 mr-1 bg-gray-200 border border-gray-300 rounded-full resize-none "
+          class="px-4 m-2 mr-1 bg-gray-200 border border-gray-300 rounded-full resize-none"
           placeholder="Input nickname here"
         ></textarea>
         <!-- 3 dots -->
@@ -47,23 +46,16 @@
           <div
             v-if="message.username != chatPayLoad.username"
             :class="friendBubble"
-          >
-            {{ message.username }} : {{ message.message }}
-          </div>
-          <div v-else :class="myBubble">
-            {{ message.username }} : {{ message.message }}
-          </div>
+          >{{ message.username }} : {{ message.message }}</div>
+          <div v-else :class="myBubble">{{ message.username }} : {{ message.message }}</div>
         </div>
       </div>
     </div>
 
-    <div
-      class="sticky flex justify-between w-full bg-green-100"
-      style="bottom: 0px"
-    >
+    <div class="sticky flex justify-between w-full bg-green-100" style="bottom: 0px">
       <textarea
         @keyup.enter="sendMessage(room_id)"
-        class="flex-grow px-4 py-2 m-2 mr-1 bg-gray-200 border border-gray-300 rounded-full resize-none "
+        class="flex-grow px-4 py-2 m-2 mr-1 bg-gray-200 border border-gray-300 rounded-full resize-none"
         rows="1"
         placeholder="Message..."
         style="outline: none"
@@ -85,18 +77,50 @@
       </button>
     </div>
   </body>
+
+  <body
+    class="flex h-screen bg-center bg-no-repeat bg-cover"
+    style="background-image: url('/src/assets/skyrim_bg_image.jpeg');"
+    v-else
+  >
+    <div class="m-auto text-white">
+      <div class="text-6xl font-extrabold text-center text-transparent text-white bg-clip-text bg-gradient-to-r" >You are not logged in</div>
+      <br />
+      <router-link to="/login">
+      <button
+        href="#"
+        class="px-4 py-2 text-center text-white bg-red-500 rounded-full hover:bg-red-700"
+      >Login here</button> </router-link>
+    </div>
+  </body>
+</html>
 </template>
 
 <script setup>
-import { firebaseDb } from "../firebase/firebase.js";
+import { firebaseDb, auth } from "../firebase/firebase.js";
 import {
   ref as fire_db_ref,
   child,
   onChildAdded,
   push,
 } from "firebase/database";
-import { ref, reactive, onMounted, onUpdated, onBeforeMount } from "vue";
+import {getAuth} from "firebase/auth"
+import { ref, reactive, onMounted, onUpdated, onBeforeMount, inject } from "vue";
 import { useRoute } from "vue-router";
+
+const globalDat = inject('global');
+const loginState = ref(false);
+//const auth = getAuth();
+auth.onAuthStateChanged(
+    ()=>{
+    if (auth.currentUser != null){
+    loginState.value = true }
+  }
+)
+
+
+//console.log(globalDat.loginState.value)
+//console.log(auth.currentUser != null)
 
 // get the router
 const route = useRoute();
@@ -125,6 +149,9 @@ const chatPayLoad = reactive({
   typedMessage: "",
   username: "alan",
 });
+
+// Login state data
+const loggedIn = ref(false);
 
 // Specify room id
 const room_id = route.params.chatid;

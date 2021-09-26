@@ -51,7 +51,11 @@ const nav_bar_content = reactive([
     name: "Chat",
     link: "/chat",
     isActive: false,
-  },
+  }, {
+    name: "Echart",
+    link: "/echarttest",
+    isActive: false,
+  }
 ]);
 
 const resetTabState = () => {

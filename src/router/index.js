@@ -5,6 +5,7 @@ import FooterComponent from "/src/components/FooterComponent.vue";
 import SalePage from "/src/components/SalePage.vue";
 import UserInfoPage from "/src/components/UserInfoPage.vue";
 import ChatComponent from "/src/components/ChatComponent.vue";
+import EchartComponent from "/src/components/EchartComponent.vue"
 
 const routes = [
   {
@@ -50,6 +51,13 @@ const routes = [
       default: ChatComponent,
     },
   },
+  {
+    path: "/echarttest",
+    name: "EchartTest",
+    components: {
+      default: EchartComponent,
+    },
+  }
   
 ];
 
